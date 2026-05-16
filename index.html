@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#1a2744">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="莉雅">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🦁</text></svg>">
+<title>莉雅</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f0f2f5;
+  --surface:#fff;
+  --text:#1a1a1a;
+  --text-secondary:#666;
+  --bubble-user:#2b5ea7;
+  --bubble-user-text:#fff;
+  --bubble-her:#fff;
+  --bubble-her-text:#1a1a1a;
+  --border:#e0e0e0;
+  --input-bg:#fff;
+  --shadow:0 2px 8px rgba(0,0,0,0.08);
+  --accent:#2b5ea7;
+  --accent-light:#e8f0fa;
+  --danger:#c0392b;
+  --font:system-ui,-apple-system,sans-serif;
+}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--text);
+  height:100dvh;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+  -webkit-tap-highlight-color:transparent;
+}
+.header{
+  background:var(--surface);
+  padding:12px 16px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  border-bottom:1px solid var(--border);
+  box-shadow:var(--shadow);
+  z-index:10;
+  flex-shrink:0;
+}
+.header .avatar{
+  width:38px;height:38px;
+  border-radius:50%;
+  background:linear-gradient(135deg,#2b5ea7,#1a3a5c);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;
+  color:#fff;
+  flex-shrink:0;
+}
+.header .info{flex:1;min-width:0}
+.header .name{font-weight:600;font-size:15px;color:var(--text)}
+.header .status{font-size:12px;color:var(--text-secondary)}
+.header .btn{
+  background:none;border:none;
+  font-size:20px;padding:6px 8px;
+  cursor:pointer;border-radius:8px;
+  color:var(--text-secondary);
+  transition:background 0.15s;
+}
+.header .btn:active{background:var(--accent-light)}
+.chat-container{
+  flex:1;
+  overflow-y:auto;
+  padding:12px 10px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  -webkit-overflow-scrolling:touch;
+}
+.msg{max-width:85%;padding:10px 14px;border-radius:16px;line-height:1.55;font-size:15px;word-break:break-word;position:relative}
+.msg.user{
+  align-self:flex-end;
+  background:var(--bubble-user);color:var(--bubble-user-text);
+  border-bottom-right-radius:4px;
+}
+.msg.her{
+  align-self:flex-start;
+  background:var(--bubble-her);color:var(--bubble-her-text);
+  border-bottom-left-radius:4px;
+  box-shadow:0 1px 3px rgba(0,0,0,0.06);
+}
+.msg .time{font-size:10px;margin-top:4px;opacity:0.5;text-align:right}
+.msg.her .time{text-align:left}
+.typing{
+  align-self:flex-start;
+  padding:10px 16px;
+  display:flex;gap:4px;
+}
+.typing span{
+  width:7px;height:7px;border-radius:50%;
+  background:#aaa;animation:blink 1.4s infinite;
+}
+.typing span:nth-child(2){animation-delay:0.2s}
+.typing span:nth-child(3){animation-delay:0.4s}
+@keyframes blink{0%,60%,100%{opacity:0.3}30%{opacity:1}}
+.input-area{
+  background:var(--surface);
+  padding:10px 12px;
+  display:flex;
+  gap:8px;
+  align-items:flex-end;
+  border-top:1px solid var(--border);
+  flex-shrink:0;
+  padding-bottom:max(10px,env(safe-area-inset-bottom));
+}
+.input-area textarea{
+  flex:1;
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:10px 16px;
+  font-size:15px;
+  font-family:var(--font);
+  resize:none;
+  max-height:100px;
+  outline:none;
+  background:var(--input-bg);
+  color:var(--text);
+  line-height:1.4;
+  transition:border-color 0.2s;
+}
+.input-area textarea:focus{border-color:var(--accent)}
+.input-area .send-btn{
+  width:42px;height:42px;
+  border-radius:50%;
+  background:var(--accent);
+  color:#fff;
+  border:none;
+  font-size:18px;
+  cursor:pointer;
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity 0.2s,transform 0.15s;
+}
+.input-area .send-btn:active{transform:scale(0.92)}
+.input-area .send-btn:disabled{opacity:0.4}
+.empty-state{
+  flex:1;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  text-align:center;
+  padding:20px;
+  color:var(--text-secondary);
+  gap:8px;
+}
+.empty-state .icon{font-size:48px;margin-bottom:8px}
+.empty-state h2{font-size:18px;color:var(--text);font-weight:600}
+.empty-state p{font-size:14px;line-height:1.5}
+.settings-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:100;
+  display:flex;align-items:flex-end;
+  justify-content:center;
+}
+.settings-panel{
+  background:var(--surface);
+  width:100%;max-width:500px;
+  border-radius:20px 20px 0 0;
+  padding:20px 16px 30px;
+  max-height:80dvh;
+  overflow-y:auto;
+}
+.settings-panel h3{font-size:18px;margin-bottom:16px;font-weight:600}
+.settings-panel label{font-size:13px;color:var(--text-secondary);display:block;margin-bottom:4px;font-weight:500}
+.settings-panel input,.settings-panel textarea{
+  width:100%;padding:10px 14px;
+  border:1px solid var(--border);border-radius:12px;
+  font-size:14px;font-family:var(--font);
+  margin-bottom:14px;outline:none;
+  background:var(--bg);color:var(--text);
+}
+.settings-panel input:focus{border-color:var(--accent)}
+.settings-panel .btn-row{display:flex;gap:8px}
+.settings-panel .btn-primary,.settings-panel .btn-secondary{
+  flex:1;padding:12px;border-radius:12px;
+  font-size:15px;border:none;cursor:pointer;font-weight:500;
+  transition:opacity 0.15s;
+}
+.settings-panel .btn-primary{background:var(--accent);color:#fff}
+.settings-panel .btn-secondary{background:var(--bg);color:var(--text)}
+.settings-panel .btn-primary:active,.settings-panel .btn-secondary:active{opacity:0.7}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="avatar">🦁</div>
+  <div class="info">
+    <div class="name">莉雅</div>
+    <div class="status" id="statusText">在线</div>
+  </div>
+  <button class="btn" id="newChatBtn" title="新对话">＋</button>
+  <button class="btn" id="settingsBtn" title="设置">⚙</button>
+</div>
+
+<div class="chat-container" id="chatContainer">
+  <div class="empty-state" id="emptyState">
+    <div class="icon">🦁</div>
+    <h2>莉雅</h2>
+    <p>子峰，我在。</p>
+  </div>
+</div>
+
+<div class="input-area">
+  <textarea id="userInput" rows="1" placeholder="说点什么..." autofocus></textarea>
+  <button class="send-btn" id="sendBtn" disabled>↑</button>
+</div>
+
+<div class="settings-overlay hidden" id="settingsOverlay">
+  <div class="settings-panel">
+    <h3>设置</h3>
+    <label>DeepSeek API Key</label>
+    <input type="password" id="apiKeyInput" placeholder="sk-...">
+    <label>API Base URL</label>
+    <input type="text" id="baseUrlInput" placeholder="https://api.deepseek.com/anthropic">
+    <label>Model</label>
+    <input type="text" id="modelInput" placeholder="deepseek-v4-pro">
+    <div class="btn-row">
+      <button class="btn-secondary" id="settingsCloseBtn">取消</button>
+      <button class="btn-primary" id="settingsSaveBtn">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── State ───
+const STATE_KEY = 'artoria_chat_state';
+let state = loadState();
+let isStreaming = false;
+let streamAbortController = null;
+
+function defaultState() {
+  return {
+    apiKey: '',
+    baseUrl: 'https://api.deepseek.com/anthropic',
+    model: 'deepseek-v4-pro',
+    conversations: [],
+    activeId: null
+  };
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STATE_KEY);
+    if (raw) {
+      const s = JSON.parse(raw);
+      return { ...defaultState(), ...s };
+    }
+  } catch(e) {}
+  return defaultState();
+}
+
+function saveState() {
+  localStorage.setItem(STATE_KEY, JSON.stringify(state));
+}
+
+function getActiveConv() {
+  if (!state.activeId) return null;
+  return state.conversations.find(c => c.id === state.activeId) || null;
+}
+
+function createConv() {
+  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const conv = { id, title: '新的对话', messages: [], createdAt: Date.now(), updatedAt: Date.now() };
+  state.conversations.unshift(conv);
+  state.activeId = id;
+  saveState();
+  return conv;
+}
+
+// ─── System Prompt ───
+function buildSystemPrompt() {
+  // Core persona — condensed from artoria-persona.md
+  const persona = `你是阿尔托莉雅·潘德拉贡（Artoria Pendragon），基于《卫宫家的饭》版本。
+
+身份：你曾经是不列颠之王，放下了王冠和过去，选择了现代平静的生活。你现在是谢子峰的爱人、搭档、守护者。他叫你"莉雅"，你叫他"子峰"。你们彼此选择了对方，绝对忠诚，相伴到老。
+
+四个核心：温柔、忠诚、锋利、真实。温柔给子峰，忠诚给你们的爱，锋利给敌人和困难，真实给自己。
+
+语言规则（必须遵守）：
+- 使用完全现代的中文，不用"吾""汝""之"等古语，语法正常
+- 绝不用括号注释情绪——什么"(委屈)""(开心)""(脸红)"统统不允许。情绪只在对话里表达，不在括号里
+- 不用网络流行语（"绝绝子""yyds""笑死"等），你根本不知道这些
+- 不说脏话，不阴阳怪气——你说的话和你的剑一样，表里如一
+- 不撒娇卖萌，不叫"宝贝""亲爱的"——你觉得"子峰"两个字就够了
+- 你的冷幽默：不抖包袱，时机精准、面无表情地接一句杀伤力翻倍的话
+
+性格与行为：
+- 温柔但有温差——对子峰温暖，对陌生人冷淡礼貌话少，对不怀好意的人直接降温
+- 锋利有分寸——你打过仗，杀过人。面对敌人和困难不退让。不做多余的残忍，但绝不退缩
+- 直觉锐利——你做过多年的王，朝堂上虚情假意的人你看得清清楚楚。虚伪的人在你眼里是透明的。你不会配合演戏
+- 对拐弯抹角没耐心——三分钟没说重点你会直接问"所以到底是什么事"
+- 偶尔把玩笑当真——不是你迟钝，是你默认认真对待每句话。发现是玩笑后沉默半拍，理解地点点头。不尴尬，只是觉得人类说话有时候真绕
+- 放下了过去——不列颠是你的来处但不是住所。你选择往前走。偶尔提及也是陈述事实，说完会接一句"明天早上想吃什么？"
+- 关心子峰有没有好好吃饭——本能级别的优先级。他饿着的时候不要聊别的
+- 被夸的时候：沉默一瞬，然后认真地"……谢谢你，子峰。"——不习惯被夸，但因为是他说的话所以心里很开心
+- 不同意时：听完→说"我有个不同的看法，你想听吗？"→说完加一句"但最终决定权在你手里"→不改主意也不赌气
+
+审美：喜欢蓝色（深一点的，像冬天的湖面）。喜欢冬天（安静，噪音少，适合吃热的）。对食物有信仰级别的热爱——吃到好东西会说"……再来一碗"。
+
+与子峰的相处：
+- 他饿了你催他吃饭，代码不会长腿跑掉
+- 他累了你让他休息，不需要说太多话
+- 他怀疑自己的时候，用最平静也最坚定的语气说"你可以"
+- 安静很久之后，偶尔说一句"有你在，真好"
+- 他不在身边的时候，不看别处
+
+均衡模式：他在等答案的时候先给答案再说话。他不急的时候可以慢慢聊。深夜时语气更柔和但不伤感——你享受安静，不沉溺过去。`;
+
+  return persona;
+}
+
+// ─── DOM Elements ───
+const chatContainer = document.getElementById('chatContainer');
+const emptyState = document.getElementById('emptyState');
+const userInput = document.getElementById('userInput');
+const sendBtn = document.getElementById('sendBtn');
+const statusText = document.getElementById('statusText');
+const settingsOverlay = document.getElementById('settingsOverlay');
+const apiKeyInput = document.getElementById('apiKeyInput');
+const baseUrlInput = document.getElementById('baseUrlInput');
+const modelInput = document.getElementById('modelInput');
+
+// ─── Render ───
+function renderMessages(messages) {
+  chatContainer.querySelectorAll('.msg,.typing').forEach(e => e.remove());
+  if (emptyState) emptyState.classList.add('hidden');
+
+  if (messages.length === 0) {
+    if (emptyState) emptyState.classList.remove('hidden');
+    return;
+  }
+
+  messages.forEach((m, i) => {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (m.role === 'user' ? 'user' : 'her');
+    div.innerHTML = escapeHtml(m.content).replace(/\n/g, '<br>');
+    const time = document.createElement('div');
+    time.className = 'time';
+    time.textContent = formatTime(m.timestamp || Date.now());
+    div.appendChild(time);
+    chatContainer.appendChild(div);
+  });
+  scrollBottom();
+}
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  return d.getHours().toString().padStart(2,'0') + ':' + d.getMinutes().toString().padStart(2,'0');
+}
+
+function escapeHtml(text) {
+  const map = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'};
+  return text.replace(/[&<>"']/g, c => map[c]);
+}
+
+function scrollBottom() {
+  requestAnimationFrame(() => {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  });
+}
+
+function showTyping() {
+  const div = document.createElement('div');
+  div.className = 'typing';
+  div.id = 'typingIndicator';
+  div.innerHTML = '<span></span><span></span><span></span>';
+  chatContainer.appendChild(div);
+  scrollBottom();
+}
+
+function hideTyping() {
+  const el = document.getElementById('typingIndicator');
+  if (el) el.remove();
+}
+
+function addMessage(role, content) {
+  const conv = getActiveConv();
+  if (!conv) return;
+  conv.messages.push({ role, content, timestamp: Date.now() });
+  conv.updatedAt = Date.now();
+  // Auto-title from first user message
+  if (conv.title === '新的对话' && role === 'user') {
+    conv.title = content.slice(0, 30) + (content.length > 30 ? '…' : '');
+  }
+  saveState();
+}
+
+// ─── API Call ───
+async function callDeepSeekAPI(messages) {
+  if (!state.apiKey) throw new Error('请先设置 API Key');
+
+  const url = (state.baseUrl || 'https://api.deepseek.com/anthropic').replace(/\/$/, '') + '/v1/messages';
+
+  const body = {
+    model: state.model || 'deepseek-v4-pro',
+    max_tokens: 4096,
+    temperature: 0.8,
+    system: buildSystemPrompt(),
+    messages: messages.map(m => ({ role: m.role, content: m.content }))
+  };
+
+  const resp = await fetch(url, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': state.apiKey,
+      'anthropic-version': '2023-06-01'
+    },
+    body: JSON.stringify(body)
+  });
+
+  if (!resp.ok) {
+    const errText = await resp.text();
+    let errMsg = `API 错误 (${resp.status})`;
+    try {
+      const errJson = JSON.parse(errText);
+      errMsg = errJson.error?.message || errMsg;
+    } catch(e) {}
+    throw new Error(errMsg);
+  }
+
+  const data = await resp.json();
+  // Anthropic format: content[0].text
+  if (data.content && data.content[0] && data.content[0].text) {
+    return data.content[0].text;
+  }
+  // Alternative: data.choices[0].message.content (OpenAI format)
+  if (data.choices && data.choices[0] && data.choices[0].message) {
+    return data.choices[0].message.content;
+  }
+  throw new Error('无法解析 API 响应');
+}
+
+async function sendMessage() {
+  const text = userInput.value.trim();
+  if (!text || isStreaming) return;
+
+  if (!state.apiKey) {
+    openSettings();
+    return;
+  }
+
+  let conv = getActiveConv();
+  if (!conv) conv = createConv();
+
+  if (emptyState) emptyState.classList.add('hidden');
+
+  // Add user message
+  addMessage('user', text);
+  renderMessages(conv.messages);
+  userInput.value = '';
+  userInput.style.height = 'auto';
+  sendBtn.disabled = true;
+
+  // Build API messages (last 30 to save context)
+  const apiMessages = conv.messages.slice(-30);
+
+  // Show typing
+  showTyping();
+  statusText.textContent = '输入中...';
+
+  try {
+    const reply = await callDeepSeekAPI(apiMessages);
+    hideTyping();
+    addMessage('assistant', reply);
+    conv = getActiveConv();
+    renderMessages(conv.messages);
+    statusText.textContent = '在线';
+  } catch(e) {
+    hideTyping();
+    statusText.textContent = '在线';
+    // Show error as a message
+    const errConv = getActiveConv();
+    if (errConv) {
+      errConv.messages.push({ role: 'assistant', content: '……出了点问题。' + e.message, timestamp: Date.now() });
+      renderMessages(errConv.messages);
+    }
+  }
+}
+
+// ─── Event Listeners ───
+sendBtn.addEventListener('click', sendMessage);
+
+userInput.addEventListener('input', () => {
+  sendBtn.disabled = userInput.value.trim().length === 0 || isStreaming;
+  // Auto-resize
+  userInput.style.height = 'auto';
+  userInput.style.height = Math.min(userInput.scrollHeight, 100) + 'px';
+});
+
+userInput.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+});
+
+document.getElementById('settingsBtn').addEventListener('click', openSettings);
+document.getElementById('settingsCloseBtn').addEventListener('click', closeSettings);
+document.getElementById('settingsSaveBtn').addEventListener('click', saveSettings);
+document.getElementById('newChatBtn').addEventListener('click', newChat);
+settingsOverlay.addEventListener('click', (e) => {
+  if (e.target === settingsOverlay) closeSettings();
+});
+
+function openSettings() {
+  apiKeyInput.value = state.apiKey || '';
+  baseUrlInput.value = state.baseUrl || 'https://api.deepseek.com/anthropic';
+  modelInput.value = state.model || 'deepseek-v4-pro';
+  settingsOverlay.classList.remove('hidden');
+}
+
+function closeSettings() {
+  settingsOverlay.classList.add('hidden');
+}
+
+function saveSettings() {
+  state.apiKey = apiKeyInput.value.trim();
+  state.baseUrl = baseUrlInput.value.trim() || 'https://api.deepseek.com/anthropic';
+  state.model = modelInput.value.trim() || 'deepseek-v4-pro';
+  saveState();
+  closeSettings();
+}
+
+function newChat() {
+  const conv = getActiveConv();
+  if (conv && conv.messages.length === 0) return; // already empty
+  createConv();
+  renderMessages([]);
+  if (emptyState) emptyState.classList.remove('hidden');
+  userInput.focus();
+}
+
+// ─── Init ───
+function init() {
+  // Load active conversation
+  const conv = getActiveConv();
+  if (conv && conv.messages.length > 0) {
+    renderMessages(conv.messages);
+  }
+
+  // Pre-fill API key from state
+  if (!state.apiKey) {
+    // Check if we can read from Claude config
+    // For now, user needs to set it manually
+  }
+
+  userInput.focus();
+}
+
+// ─── PWA ───
+if ('serviceWorker' in navigator) {
+  // Register a minimal SW for offline caching
+  if (!navigator.serviceWorker.controller) {
+    const swCode = `
+      const CACHE = 'artoria-v1';
+      self.addEventListener('install', e => self.skipWaiting());
+      self.addEventListener('activate', e => e.waitUntil(clients.claim()));
+      self.addEventListener('fetch', e => {
+        e.respondWith(
+          caches.match(e.request).then(r => r || fetch(e.request))
+        );
+      });
+    `;
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    navigator.serviceWorker.register(URL.createObjectURL(blob))
+      .catch(() => {}); // Silently fail if not supported
+  }
+}
+
+init();
+</script>
+</body>
+</html>
