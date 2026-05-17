@@ -39,34 +39,43 @@ body{
   -webkit-tap-highlight-color:transparent;
 }
 .header{
-  background:#1a1a1a;
-  padding:12px 16px;
+  background:#303030;
+  padding:8px 12px;
   display:flex;
   align-items:center;
   gap:10px;
-  border-bottom:1px solid #333;
+  border-bottom:1px solid #222;
+  flex-shrink:0;
+  min-height:48px;
+}
+.header .back{
+  color:#fff;
+  font-size:22px;
+  line-height:1;
+  padding:4px;
+  text-decoration:none;
   flex-shrink:0;
 }
 .header .avatar{
-  width:36px;height:36px;
+  width:32px;height:32px;
   border-radius:4px;
   background:linear-gradient(135deg,#2b5ea7,#1a3a5c);
   display:flex;align-items:center;justify-content:center;
-  font-size:18px;
+  font-size:16px;
   color:#fff;
   flex-shrink:0;
 }
-.header .info{flex:1;min-width:0}
+.header .info{flex:1;min-width:0;text-align:center}
 .header .name{font-weight:500;font-size:16px;color:#fff}
-.header .status{font-size:12px;color:#999}
+.header .status{font-size:11px;color:#aaa}
 .header .btn{
   background:none;border:none;
   font-size:18px;padding:6px 8px;
   cursor:pointer;border-radius:8px;
-  color:#999;
+  color:#ccc;
   transition:background 0.15s;
 }
-.header .btn:active{background:rgba(255,255,255,0.1)}
+.header .btn:active{background:rgba(255,255,255,0.15)}
 .chat-container{
   flex:1;
   overflow-y:auto;
@@ -76,60 +85,112 @@ body{
   gap:8px;
   -webkit-overflow-scrolling:touch;
 }
-.msg{max-width:85%;padding:10px 14px;border-radius:16px;line-height:1.55;font-size:15px;word-break:break-word;position:relative}
+.msg{max-width:75%;padding:9px 12px;border-radius:6px;line-height:1.5;font-size:15px;word-break:break-word;position:relative;display:flex;align-items:flex-end;gap:6px}
+.msg .bubble{position:relative;padding:0}
 .msg.user{
   align-self:flex-end;
+  flex-direction:row-reverse;
+}
+.msg.user .bubble{
   background:var(--bubble-user);color:var(--bubble-user-text);
-  border-bottom-right-radius:4px;
+  border-radius:6px;
+  padding:9px 12px;
+}
+.msg.user .bubble::after{
+  content:'';
+  position:absolute;
+  right:-4px;top:12px;
+  width:0;height:0;
+  border-left:5px solid var(--bubble-user);
+  border-top:3px solid transparent;
+  border-bottom:3px solid transparent;
 }
 .msg.her{
   align-self:flex-start;
+}
+.msg.her .bubble{
   background:var(--bubble-her);color:var(--bubble-her-text);
-  border-bottom-left-radius:4px;
-  box-shadow:0 1px 3px rgba(0,0,0,0.06);
+  border-radius:6px;
+  padding:9px 12px;
+  box-shadow:0 1px 2px rgba(0,0,0,0.06);
 }
-.msg .time{font-size:10px;margin-top:4px;opacity:0.5;text-align:right}
+.msg.her .bubble::after{
+  content:'';
+  position:absolute;
+  left:-4px;top:12px;
+  width:0;height:0;
+  border-right:5px solid var(--bubble-her);
+  border-top:3px solid transparent;
+  border-bottom:3px solid transparent;
+}
+.msg .avatar-sm{
+  width:32px;height:32px;
+  border-radius:4px;
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:14px;
+}
+.msg.user .avatar-sm{background:linear-gradient(135deg,#56ab2f,#a8e063);color:#fff}
+.msg.her .avatar-sm{background:linear-gradient(135deg,#2b5ea7,#1a3a5c);color:#fff}
+.msg .time{font-size:10px;margin-top:2px;opacity:0.4;text-align:right}
 .msg.her .time{text-align:left}
-.typing{
-  align-self:flex-start;
-  padding:10px 16px;
-  display:flex;gap:4px;
+.time-divider{
+  text-align:center;
+  padding:8px 0;
+  font-size:11px;
+  color:#b0b0b0;
 }
-.typing span{
+.typing-dots{
+  display:flex;gap:4px;padding:10px 16px;
+}
+.typing-dots span{
   width:7px;height:7px;border-radius:4px;
   background:#aaa;animation:blink 1.4s infinite;
 }
-.typing span:nth-child(2){animation-delay:0.2s}
-.typing span:nth-child(3){animation-delay:0.4s}
+.typing-dots span:nth-child(2){animation-delay:0.2s}
+.typing-dots span:nth-child(3){animation-delay:0.4s}
 @keyframes blink{0%,60%,100%{opacity:0.3}30%{opacity:1}}
 .input-area{
   background:#f7f7f7;
-  padding:10px 12px;
+  padding:6px 8px;
   display:flex;
-  gap:8px;
+  gap:6px;
   align-items:flex-end;
-  border-top:1px solid var(--border);
+  border-top:1px solid #d9d9d9;
   flex-shrink:0;
-  padding-bottom:max(10px,env(safe-area-inset-bottom));
+  padding-bottom:max(6px,env(safe-area-inset-bottom));
 }
+.input-area .icon-btn{
+  width:36px;height:36px;
+  border:none;
+  background:none;
+  font-size:22px;
+  cursor:pointer;
+  border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+  color:#666;
+  padding:0;
+}
+.input-area .icon-btn:active{background:rgba(0,0,0,0.06)}
 .input-area textarea{
   flex:1;
-  border:1px solid var(--border);
-  border-radius:20px;
-  padding:10px 16px;
+  border:1px solid #d9d9d9;
+  border-radius:6px;
+  padding:8px 10px;
   font-size:15px;
   font-family:var(--font);
   resize:none;
   max-height:100px;
   outline:none;
-  background:var(--input-bg);
+  background:#fff;
   color:var(--text);
   line-height:1.4;
   transition:border-color 0.2s;
 }
 .input-area textarea:focus{border-color:var(--accent)}
 .input-area .send-btn{
-  width:42px;height:42px;
+  width:36px;height:36px;
   border-radius:4px;
   background:var(--accent);
   color:#fff;
@@ -194,10 +255,10 @@ body{
 <body>
 
 <div class="header">
+  <a class="back" href="javascript:history.back()" aria-label="返回">‹</a>
   <div class="avatar">🦁</div>
   <div class="info">
     <div class="name">莉雅</div>
-    <div class="status" id="statusText">在线</div>
   </div>
   <button class="btn" id="newChatBtn" title="新对话">＋</button>
   <button class="btn" id="settingsBtn" title="设置">⚙</button>
@@ -212,7 +273,9 @@ body{
 </div>
 
 <div class="input-area">
-  <textarea id="userInput" rows="1" placeholder="说点什么..." autofocus></textarea>
+  <button class="icon-btn" aria-label="语音">🎤</button>
+  <textarea id="userInput" rows="1" placeholder="" autofocus></textarea>
+  <button class="icon-btn" aria-label="表情">😊</button>
   <button class="send-btn" id="sendBtn" disabled>↑</button>
 </div>
 
@@ -404,7 +467,7 @@ const chatContainer = document.getElementById('chatContainer');
 const emptyState = document.getElementById('emptyState');
 const userInput = document.getElementById('userInput');
 const sendBtn = document.getElementById('sendBtn');
-const statusText = document.getElementById('statusText');
+const statusText = document.getElementById('statusText') || { textContent: '' };
 const settingsOverlay = document.getElementById('settingsOverlay');
 const apiKeyInput = document.getElementById('apiKeyInput');
 const baseUrlInput = document.getElementById('baseUrlInput');
@@ -413,7 +476,7 @@ const proxyCheckbox = document.getElementById('proxyCheckbox');
 
 // ─── Render ───
 function renderMessages(messages) {
-  chatContainer.querySelectorAll('.msg,.typing').forEach(e => e.remove());
+  chatContainer.querySelectorAll('.msg,.typing,.time-divider').forEach(e => e.remove());
   if (emptyState) emptyState.classList.add('hidden');
 
   if (messages.length === 0) {
@@ -422,16 +485,47 @@ function renderMessages(messages) {
   }
 
   messages.forEach((m, i) => {
-    const div = document.createElement('div');
-    div.className = 'msg ' + (m.role === 'user' ? 'user' : 'her');
-    div.innerHTML = escapeHtml(m.content).replace(/\n/g, '<br>');
+    const prev = i > 0 ? messages[i - 1] : null;
+    const gap = prev ? (m.timestamp || Date.now()) - (prev.timestamp || Date.now()) : 0;
+    if (gap > 300000 && prev) {
+      const div = document.createElement('div');
+      div.className = 'time-divider';
+      div.textContent = formatTimeFull(m.timestamp || Date.now());
+      chatContainer.appendChild(div);
+    }
+
+    const isUser = m.role === 'user';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'msg ' + (isUser ? 'user' : 'her');
+
+    const avatar = document.createElement('div');
+    avatar.className = 'avatar-sm';
+    avatar.textContent = isUser ? '🐻' : '🦁';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = m.content;
+
     const time = document.createElement('div');
     time.className = 'time';
     time.textContent = formatTime(m.timestamp || Date.now());
-    div.appendChild(time);
-    chatContainer.appendChild(div);
+    bubble.appendChild(time);
+
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(bubble);
+    chatContainer.appendChild(wrapper);
   });
   scrollBottom();
+}
+
+function formatTimeFull(ts) {
+  const d = new Date(ts);
+  const now = new Date();
+  const isToday = d.toDateString() === now.toDateString();
+  const h = d.getHours().toString().padStart(2, '0');
+  const m = d.getMinutes().toString().padStart(2, '0');
+  if (isToday) return h + ':' + m;
+  return (d.getMonth() + 1) + '月' + d.getDate() + '日 ' + h + ':' + m;
 }
 
 function formatTime(ts) {
@@ -451,11 +545,21 @@ function scrollBottom() {
 }
 
 function showTyping() {
-  const div = document.createElement('div');
-  div.className = 'typing';
-  div.id = 'typingIndicator';
-  div.innerHTML = '<span></span><span></span><span></span>';
-  chatContainer.appendChild(div);
+  const wrapper = document.createElement('div');
+  wrapper.className = 'msg her';
+  wrapper.id = 'typingIndicator';
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar-sm';
+  avatar.textContent = '🦁';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  const dots = document.createElement('div');
+  dots.className = 'typing-dots';
+  dots.innerHTML = '<span></span><span></span><span></span>';
+  bubble.appendChild(dots);
+  wrapper.appendChild(avatar);
+  wrapper.appendChild(bubble);
+  chatContainer.appendChild(wrapper);
   scrollBottom();
 }
 
