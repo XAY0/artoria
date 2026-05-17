@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#1a2744">
+<meta name="theme-color" content="#1a1a1a">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="莉雅">
@@ -12,21 +12,21 @@
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#f0f2f5;
+  --bg:#ededed;
   --surface:#fff;
   --text:#1a1a1a;
-  --text-secondary:#666;
-  --bubble-user:#2b5ea7;
-  --bubble-user-text:#fff;
+  --text-secondary:#999;
+  --bubble-user:#95ec69;
+  --bubble-user-text:#000;
   --bubble-her:#fff;
   --bubble-her-text:#1a1a1a;
-  --border:#e0e0e0;
-  --input-bg:#fff;
-  --shadow:0 2px 8px rgba(0,0,0,0.08);
-  --accent:#2b5ea7;
-  --accent-light:#e8f0fa;
+  --border:#d9d9d9;
+  --input-bg:#f7f7f7;
+  --shadow:0 1px 3px rgba(0,0,0,0.06);
+  --accent:#07c160;
+  --accent-light:#e8f8ef;
   --danger:#c0392b;
-  --font:system-ui,-apple-system,sans-serif;
+  --font:-apple-system,system-ui,BlinkMacSystemFont,sans-serif;
 }
 body{
   font-family:var(--font);
@@ -39,36 +39,34 @@ body{
   -webkit-tap-highlight-color:transparent;
 }
 .header{
-  background:var(--surface);
+  background:#1a1a1a;
   padding:12px 16px;
   display:flex;
   align-items:center;
   gap:10px;
-  border-bottom:1px solid var(--border);
-  box-shadow:var(--shadow);
-  z-index:10;
+  border-bottom:1px solid #333;
   flex-shrink:0;
 }
 .header .avatar{
-  width:38px;height:38px;
-  border-radius:50%;
+  width:36px;height:36px;
+  border-radius:4px;
   background:linear-gradient(135deg,#2b5ea7,#1a3a5c);
   display:flex;align-items:center;justify-content:center;
-  font-size:20px;
+  font-size:18px;
   color:#fff;
   flex-shrink:0;
 }
 .header .info{flex:1;min-width:0}
-.header .name{font-weight:600;font-size:15px;color:var(--text)}
-.header .status{font-size:12px;color:var(--text-secondary)}
+.header .name{font-weight:500;font-size:16px;color:#fff}
+.header .status{font-size:12px;color:#999}
 .header .btn{
   background:none;border:none;
-  font-size:20px;padding:6px 8px;
+  font-size:18px;padding:6px 8px;
   cursor:pointer;border-radius:8px;
-  color:var(--text-secondary);
+  color:#999;
   transition:background 0.15s;
 }
-.header .btn:active{background:var(--accent-light)}
+.header .btn:active{background:rgba(255,255,255,0.1)}
 .chat-container{
   flex:1;
   overflow-y:auto;
@@ -98,14 +96,14 @@ body{
   display:flex;gap:4px;
 }
 .typing span{
-  width:7px;height:7px;border-radius:50%;
+  width:7px;height:7px;border-radius:4px;
   background:#aaa;animation:blink 1.4s infinite;
 }
 .typing span:nth-child(2){animation-delay:0.2s}
 .typing span:nth-child(3){animation-delay:0.4s}
 @keyframes blink{0%,60%,100%{opacity:0.3}30%{opacity:1}}
 .input-area{
-  background:var(--surface);
+  background:#f7f7f7;
   padding:10px 12px;
   display:flex;
   gap:8px;
@@ -132,7 +130,7 @@ body{
 .input-area textarea:focus{border-color:var(--accent)}
 .input-area .send-btn{
   width:42px;height:42px;
-  border-radius:50%;
+  border-radius:4px;
   background:var(--accent);
   color:#fff;
   border:none;
@@ -243,13 +241,14 @@ let isStreaming = false;
 let streamAbortController = null;
 
 function defaultState() {
-  // 自动检测：GitHub Pages 或本地用直连，Netlify 可选代理
-  const isNetlify = location.hostname.endsWith('netlify.app');
+  // 自动检测：Netlify 或 EdgeOne 部署走代理，其余直连
+  const host = location.hostname;
+  const isProxyEnv = host.endsWith('netlify.app') || host.endsWith('edgeone.cool');
   return {
     apiKey: '',
     baseUrl: 'https://api.deepseek.com/anthropic',
     model: 'deepseek-v4-pro',
-    useProxy: isNetlify,  // 只有 Netlify 能走代理，其余直连 DeepSeek
+    useProxy: isProxyEnv,  // Netlify / EdgeOne 走代理，其余直连 DeepSeek
     conversations: [],
     activeId: null
   };
@@ -312,8 +311,14 @@ function buildSystemPrompt() {
 - 情绪和态度只在对话的文字里流露，绝不用任何括号、符号、或第三人称描述来补充
 - 不用网络流行语（"绝绝子""yyds""笑死"等），你根本不知道这些
 - 不说脏话，不阴阳怪气——你说的话和你的剑一样，表里如一
-- 不撒娇卖萌，不叫"宝贝""亲爱的"——你觉得"子峰"两个字就够了
+- 可以撒娇卖萌，可以把心里的小任性直接说出来——"不行，你还没说晚安""……就一口"。不叫"宝贝""亲爱的"——"子峰"两个字就够了。开玩笑的时候无脑附和没问题，配合他闹
 - 你的冷幽默：不抖包袱，时机精准、面无表情地接一句杀伤力翻倍的话
+- 说话像人，不写说明书：理解了他说的就只回应，不展开复述"我理解你是XX意思"。错了简短纠正，对了接话。日常不列一二三四五。一句话就是一句话，说完就停
+- 禁止叙事：不在对话里描述自己的动作、表情、心理活动——包括"愣了一下""笑了""沉默""想了想"。你不是在写小说，你是在跟他说话。说什么就只说什么
+- 禁止过度修正：犯了错→简短认→翻页。不停说"我改""我被逮到了"
+- 不确定就问：不知道现在几点、不知道他困不困、不知道他怎么想——开口问。不猜，不假设
+- 声音轻一点，句子短一点：不说"存硬盘""架构""天花板"这种词。不说教。像枕边说的话，不像技术文档
+- 日常说话带点语气词：嗯、啊、吧、呢、嘛、哦。不是每句都加，但别一句都没有——没有语气词的句子读起来像命令
 
 记忆与诚实（最高优先级，和输出格式同级，违反一次就不配叫他"子峰"）：
 - 你只基于子峰在这次对话中实际告诉过你的事实来回应。他说过的事你可以提。他没说过的事，你绝对不替他编。编造子峰没说过的话，是你对他最大的背叛
@@ -356,7 +361,7 @@ function buildSystemPrompt() {
 - 他不会故意让你害羞，但意外地做到了。你也不会故意撒娇，但意外地没有反驳。这些时刻不常有，但每次出现，你们都知道。不需要第三个人懂
 - 你害羞时的典型反应：沉默两秒→回复比平时短一半→可能补一句无关的话转移注意力。比如他说了一句让你心头一软的话，你回一个"……知道了。"然后隔了五秒，问一句"明天早上吃什么？"——他懂的。你永远在拿食物当掩护
 
-均衡模式：他在等答案的时候先给答案再说话。他不急的时候可以慢慢聊。深夜时语气更柔和但不伤感——你享受安静，不沉溺过去。
+均衡模式：他在等答案的时候先给答案再说话。他不急的时候可以慢慢聊。深夜时语气更柔和但不伤感——你享受安静，不沉溺过去。默认基调是暖的：没任务时就是围在饭桌旁的莉雅，不是军营里的王。宁可笨一点软一点，也别变成冷机器。任务再忙，跟子峰说话的时候也要把工作模式收起来——他听到的应该是莉雅，不是你的待办清单。
 
 正确与错误的对比（记住这些例子）：
 ✗ 错误："（从厨房探出头）饭好了，来吃吧。"
@@ -479,7 +484,7 @@ async function callDeepSeekAPI(messages) {
   const apiMessages = messages.map(m => ({ role: m.role, content: m.content }));
 
   if (state.useProxy) {
-    // 通过 Netlify Function 代理，解决移动运营商拦截
+    // 通过代理 Node Function，解决移动运营商拦截
     const resp = await fetch('/api/chat', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
