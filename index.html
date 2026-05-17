@@ -243,11 +243,13 @@ let isStreaming = false;
 let streamAbortController = null;
 
 function defaultState() {
+  // 自动检测：GitHub Pages 或本地用直连，Netlify 可选代理
+  const isNetlify = location.hostname.endsWith('netlify.app');
   return {
     apiKey: '',
     baseUrl: 'https://api.deepseek.com/anthropic',
     model: 'deepseek-v4-pro',
-    useProxy: true,  // 通过 Netlify 代理，流量也能通
+    useProxy: isNetlify,  // 只有 Netlify 能走代理，其余直连 DeepSeek
     conversations: [],
     activeId: null
   };
