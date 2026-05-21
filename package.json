@@ -1,0 +1,18 @@
+{
+  "name": "artoria-server",
+  "version": "0.1.0",
+  "description": "莉雅云后端 MVP — 统一记忆、会话管理、DeepSeek 代理",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "sql.js": "^1.12.0",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.2",
+    "express": "^4.21.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5"
+  }
+}
